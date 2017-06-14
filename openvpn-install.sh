@@ -471,8 +471,10 @@ status openvpn.log
 verb 3
 sndbuf 0
 rcvbuf 0
-;comp-lzo
-;client-to-client
+compress lz4
+duplicate-cn
+script-security 3
+auth-user-pass-verify /etc/openvpn/script-verify.sh via-env
 ;max-clients 100" >> /etc/openvpn/server.conf
 
 	# Create the sysctl configuration file if needed (mainly for Arch Linux)
@@ -584,6 +586,7 @@ nobind
 persist-key
 persist-tun
 remote-cert-tls server
+auth-user-pass
 auth SHA256
 $CIPHER
 tls-client
@@ -593,7 +596,10 @@ setenv opt block-outside-dns
 verb 3
 sndbuf 0
 rcvbuf 0
-;comp-lzo" >> /etc/openvpn/client-template.txt
+compress lz4
+script-security 3
+#up /etc/openvpn/update-resolv-conf
+#down /etc/openvpn/update-resolv-conf" >> /etc/openvpn/client-template.txt
 
 	# Generate the custom client.ovpn
 	newclient "$CLIENT"
@@ -602,5 +608,19 @@ rcvbuf 0
 	echo ""
 	echo "Your client config is available at ~/$CLIENT.ovpn"
 	echo "If you want to add more clients, you simply need to run this script another time!"
+	
+	echo "Auth Setup"
+	read -p "URL: " -e -i "" URL
+
+	echo "#!/bin/bash
+	url = $URL
+	response = \$(curl --request POST --url \$url --data \"username=\$username&password=\$password\" --write-out \"%{http_code}\" --silent --output /dev/null)
+
+	if [[ \$response == 200 ]]; then
+	  exit 0
+	fi
+	exit 1" >> /etc/openvpn/script-verify.sh
+	
+	
 fi
 exit 0;
