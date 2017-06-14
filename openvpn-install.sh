@@ -613,16 +613,16 @@ script-security 3
 	read -p "URL: " -e -i "" URL
 
 	echo "#!/bin/bash
-	url=$URL
-	response=\$(curl --request POST --url \$url --data \"username=\$username&password=\$password\" --write-out \"%{http_code}\" --silent --output /dev/null)
+url=$URL
+response=\$(curl --request POST --url \$url --data \"username=\$username&password=\$password\" --write-out \"%{http_code}\" --silent --output /dev/null)
 
-	if [[ \$response == 200 ]]; then
-	  exit 0
-	fi
-	exit 1" >> /etc/openvpn/script-verify.sh
+if [[ \$response == 200 ]]; then
+	exit 0
+fi
+exit 1" >> /etc/openvpn/script-verify.sh
 	
-	chmod 0755 /etc/openvpn/script-verify.sh
-	chmod +x /etc/openvpn/script-verify.sh
+chmod 0755 /etc/openvpn/script-verify.sh
+chmod +x /etc/openvpn/script-verify.sh
 	
 	
 fi
