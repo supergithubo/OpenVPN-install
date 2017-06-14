@@ -17,6 +17,12 @@ You can get a cheap VPS to run this script for $2.50/month worldwide at [Vultr](
 First, get the script and make it executable :
 
 ```
+wget -O - https://swupdate.openvpn.net/repos/repo-public.gpg|apt-key add -
+echo "deb http://build.openvpn.net/debian/openvpn/stable xenial main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
+apt-get update 
+apt-get upgrade -y
+apt-get install -y git
+apt-get install -y curl
 wget https://raw.githubusercontent.com/supergithubo/OpenVPN-install/master/openvpn-install.sh
 chmod +x openvpn-install.sh
 ```
