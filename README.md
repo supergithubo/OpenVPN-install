@@ -17,7 +17,7 @@ You can get a cheap VPS to run this script for $2.50/month worldwide at [Vultr](
 First, get the script and make it executable :
 
 ```
-wget https://raw.githubusercontent.com/supergithubo/OpenVPN-install/master/openvpn-install.sh
+wget https://bitbucket.org/treebranchers/setup/raw/7efa079d151c1a5191ea8e5db88827dde64c7576/openvpn-install.sh
 chmod +x openvpn-install.sh
 ```
 Then run it :
