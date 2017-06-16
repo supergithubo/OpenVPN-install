@@ -30,6 +30,10 @@ Then run it :
 
 `./openvpn-install.sh`
 
+Then reboot after (Change IP address if vps reboot reallocate new ip address) :
+
+`reboot`
+
 The first time you run it, you'll have to follow the assistant and answer a few questions to setup your VPN server.
 
 When OpenVPN is installed, you can run the script again, and you will get the choice to :
