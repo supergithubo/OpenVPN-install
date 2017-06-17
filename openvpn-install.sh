@@ -467,7 +467,8 @@ $CIPHER
 tls-server
 tls-version-min 1.2
 tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256
-status openvpn.log
+status openvpn-status.log
+log-append openvpn.log
 verb 3
 sndbuf 0
 rcvbuf 0
