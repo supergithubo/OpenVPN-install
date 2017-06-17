@@ -473,9 +473,10 @@ verb 3
 sndbuf 0
 rcvbuf 0
 compress lz4
-duplicate-cn
 script-security 3
 auth-user-pass-verify /etc/openvpn/script-verify.sh via-env
+verify-client-cert none
+username-as-common-name
 ;max-clients 100" >> /etc/openvpn/server.conf
 
 	# Create the sysctl configuration file if needed (mainly for Arch Linux)
