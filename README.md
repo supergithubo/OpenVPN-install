@@ -30,6 +30,10 @@ Then run it :
 
 `./openvpn-install.sh`
 
+Then change timezone. Set it to ASIA > MANILA (IMPORTANT) :
+
+`sudo dpkg-reconfigure tzdata`
+
 Then reboot after (Change IP address if vps reboot reallocate new ip address) :
 
 `reboot`
