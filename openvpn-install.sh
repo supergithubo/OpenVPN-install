@@ -616,7 +616,8 @@ script-security 3
 
 	echo "#!/bin/bash
 url=$URL
-response=\$(curl --request POST --url \$url --data \"username=\$username&password=\$password\" --write-out \"%{http_code}\" --silent --output /dev/null)
+remote_ip=$IP
+response=\$(curl --request POST --url \$url --data \"remote_ip=\$remote_ip&username=\$username&password=\$password\" --write-out \"%{http_code}\" --silent --output /dev/null)
 
 if [[ \$response == 200 ]]; then
 	exit 0
