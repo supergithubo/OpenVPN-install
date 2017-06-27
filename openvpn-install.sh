@@ -631,7 +631,9 @@ chmod +x /etc/openvpn/script-verify.sh
 
 	echo "#!/bin/bash
 url=$URL/sys/sessions/connect
-response=\$(curl --request POST --url \$url --data \"common_name=\$common_name&trusted_ip=\$trusted_ip&trusted_port=\$trusted_port&remote_ip=\$ifconfig_pool_remote_ip&remote_port=\$remote_port_1\" --write-out \"%{http_code}\" --silent --output /dev/null)
+remote_ip=$IP
+remote_port=$PORT
+response=\$(curl --request POST --url \$url --data \"common_name=\$common_name&trusted_ip=\$trusted_ip&trusted_port=\$trusted_port&remote_ip=\$remote_ip&remote_port=\$remote_port\" --write-out \"%{http_code}\" --silent --output /dev/null)
 
 if [[ \$response == 200 ]]; then
 	exit 0
@@ -643,7 +645,9 @@ chmod +x /etc/openvpn/script-connect.sh
 
 	echo "#!/bin/bash
 url=$URL/sys/sessions/disconnect
-response=\$(curl --request POST --url \$url --data \"common_name=\$common_name&trusted_ip=\$trusted_ip&trusted_port=\$trusted_port&remote_ip=\$ifconfig_pool_remote_ip&remote_port=\$remote_port_1&bytes_sent=\$bytes_sent&bytes_received=\$bytes_received\" --write-out \"%{http_code}\" --silent --output /dev/null)
+remote_ip=$IP
+remote_port=$PORT
+response=\$(curl --request POST --url \$url --data \"common_name=\$common_name&trusted_ip=\$trusted_ip&trusted_port=\$trusted_port&remote_ip=\$remote_ip&remote_port=\$remote_port&bytes_sent=\$bytes_sent&bytes_received=\$bytes_received\" --write-out \"%{http_code}\" --silent --output /dev/null)
 
 if [[ \$response == 200 ]]; then
 	exit 0
