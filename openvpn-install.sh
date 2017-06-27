@@ -475,6 +475,8 @@ rcvbuf 0
 compress lz4
 script-security 3
 auth-user-pass-verify /etc/openvpn/script-verify.sh via-env
+client-connect /etc/openvpn/script-connect.sh
+client-disconnect /etc/openvpn/script-disconnect.sh
 verify-client-cert none
 username-as-common-name
 ;max-clients 100" >> /etc/openvpn/server.conf
@@ -615,7 +617,7 @@ script-security 3
 	read -p "URL: " -e -i "" URL
 
 	echo "#!/bin/bash
-url=$URL
+url=$URL/sys/auth/verify
 remote_ip=$IP
 response=\$(curl --request POST --url \$url --data \"remote_ip=\$remote_ip&username=\$username&password=\$password\" --write-out \"%{http_code}\" --silent --output /dev/null)
 
@@ -626,7 +628,30 @@ exit 1" >> /etc/openvpn/script-verify.sh
 	
 chmod 0755 /etc/openvpn/script-verify.sh
 chmod +x /etc/openvpn/script-verify.sh
+
+	echo "#!/bin/bash
+url=$URL/sys/sessions/connect
+response=\$(curl --request POST --url \$url --data \"common_name=\$common_name&trusted_ip=\$trusted_ip&trusted_port=\$trusted_port&remote_ip=\$ifconfig_pool_remote_ip&remote_port=\$remote_port_1\" --write-out \"%{http_code}\" --silent --output /dev/null)
+
+if [[ \$response == 200 ]]; then
+	exit 0
+fi
+exit 1" >> /etc/openvpn/script-connect.sh
 	
+chmod 0755 /etc/openvpn/script-connect.sh
+chmod +x /etc/openvpn/script-connect.sh
+
+	echo "#!/bin/bash
+url=$URL/sys/sessions/disconnect
+response=\$(curl --request POST --url \$url --data \"common_name=\$common_name&trusted_ip=\$trusted_ip&trusted_port=\$trusted_port&remote_ip=\$ifconfig_pool_remote_ip&remote_port=\$remote_port_1&bytes_sent=\$bytes_sent&bytes_received=\$bytes_received\" --write-out \"%{http_code}\" --silent --output /dev/null)
+
+if [[ \$response == 200 ]]; then
+	exit 0
+fi
+exit 1" >> /etc/openvpn/script-disconnect.sh
+	
+chmod 0755 /etc/openvpn/script-disconnect.sh
+chmod +x /etc/openvpn/script-disconnect.sh
 	
 fi
 exit 0;
