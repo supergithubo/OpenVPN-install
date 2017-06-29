@@ -607,7 +607,9 @@ script-security 3
 reneg-sec 86400
 #up /etc/openvpn/update-resolv-conf
 #down /etc/openvpn/update-resolv-conf" >> /etc/openvpn/client-template.txt
-
+if [[ "$PROTOCOL" = 'UDP' ]]; then
+	echo "explicit-exit-notify 2" >> /etc/openvpn/client-template.txt
+fi
 	# Generate the custom client.ovpn
 	newclient "$CLIENT"
 	echo ""
