@@ -474,6 +474,8 @@ sndbuf 0
 rcvbuf 0
 compress lz4
 script-security 3
+reneg-sec 86400
+duplicate-cn
 auth-user-pass-verify /etc/openvpn/script-verify.sh via-env
 client-connect /etc/openvpn/script-connect.sh
 client-disconnect /etc/openvpn/script-disconnect.sh
@@ -602,6 +604,7 @@ sndbuf 0
 rcvbuf 0
 compress lz4
 script-security 3
+reneg-sec 86400
 #up /etc/openvpn/update-resolv-conf
 #down /etc/openvpn/update-resolv-conf" >> /etc/openvpn/client-template.txt
 
