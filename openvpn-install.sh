@@ -649,7 +649,7 @@ remote_ip=$IP
 remote_port=$PORT
 response=\$(curl --request PUT --url \$url --data \"common_name=\$common_name&trusted_ip=\$trusted_ip&trusted_port=\$trusted_port&remote_ip=\$remote_ip&remote_port=\$remote_port&bytes_sent=\$bytes_sent&bytes_received=\$bytes_received\" --write-out \"%{http_code}\" --silent --output /dev/null)
 
-if [[ \$response == 200 ]]; then
+if [[ \$response == 201 ]]; then
 	exit 0
 fi
 exit 1" >> /etc/openvpn/script-disconnect.sh
