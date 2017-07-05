@@ -475,10 +475,9 @@ rcvbuf 0
 compress lz4
 script-security 3
 reneg-sec 86400
-duplicate-cn
-auth-user-pass-verify /etc/openvpn/script-verify.sh via-env
-client-connect /etc/openvpn/script-connect.sh
-client-disconnect /etc/openvpn/script-disconnect.sh
+auth-user-pass-verify /etc/openvpn/bin/script-verify.sh via-env
+client-connect /etc/openvpn/bin/script-connect.sh
+client-disconnect /etc/openvpn/bin/script-disconnect.sh
 verify-client-cert none
 username-as-common-name
 ;max-clients 100" >> /etc/openvpn/server.conf
@@ -621,6 +620,10 @@ fi
 	echo "Auth Setup"
 	read -p "URL: " -e -i "" URL
 
+	# Generate scripts
+	
+	mkdir /etc/openvpn/bin
+
 	echo "#!/bin/bash
 url=$URL/sys/auth/verify
 remote_ip=$IP
@@ -629,24 +632,25 @@ response=\$(curl --request POST --url \$url --data \"remote_ip=\$remote_ip&usern
 if [[ \$response == 200 ]]; then
 	exit 0
 fi
-exit 1" >> /etc/openvpn/script-verify.sh
+exit 1" > /etc/openvpn/bin/script-verify.sh
 	
-chmod 0755 /etc/openvpn/script-verify.sh
-chmod +x /etc/openvpn/script-verify.sh
+chmod 0755 /etc/openvpn/bin/script-verify.sh
+chmod +x /etc/openvpn/bin/script-verify.sh
 
-	echo "#!/bin/bash
+echo "#!/bin/bash
 url=$URL/sys/sessions/connect
 remote_ip=$IP
 remote_port=$PORT
 response=\$(curl --request POST --url \$url --data \"common_name=\$common_name&trusted_ip=\$trusted_ip&trusted_port=\$trusted_port&remote_ip=\$remote_ip&remote_port=\$remote_port\" --write-out \"%{http_code}\" --silent --output /dev/null)
 
 if [[ \$response == 200 ]]; then
+	sh /etc/openvpn/bin/connection-appender.sh \$common_name \$trusted_ip \$trusted_port \$remote_ip \$remote_port
 	exit 0
 fi
-exit 1" >> /etc/openvpn/script-connect.sh
+exit 1" > /etc/openvpn/bin/script-connect.sh
 	
-chmod 0755 /etc/openvpn/script-connect.sh
-chmod +x /etc/openvpn/script-connect.sh
+chmod 0755 /etc/openvpn/bin/script-connect.sh
+chmod +x /etc/openvpn/bin/script-connect.sh
 
 	echo "#!/bin/bash
 url=$URL/sys/sessions/disconnect
@@ -655,12 +659,61 @@ remote_port=$PORT
 response=\$(curl --request PUT --url \$url --data \"common_name=\$common_name&trusted_ip=\$trusted_ip&trusted_port=\$trusted_port&remote_ip=\$remote_ip&remote_port=\$remote_port&bytes_sent=\$bytes_sent&bytes_received=\$bytes_received\" --write-out \"%{http_code}\" --silent --output /dev/null)
 
 if [[ \$response == 201 ]]; then
+	sh /etc/openvpn/bin/connection-detacher.sh \$common_name \$trusted_ip \$trusted_port \$remote_ip \$remote_port
 	exit 0
 fi
-exit 1" >> /etc/openvpn/script-disconnect.sh
+exit 1" > /etc/openvpn/bin/script-disconnect.sh
 	
-chmod 0755 /etc/openvpn/script-disconnect.sh
-chmod +x /etc/openvpn/script-disconnect.sh
+chmod 0755 /etc/openvpn/bin/script-disconnect.sh
+chmod +x /etc/openvpn/bin/script-disconnect.sh
+
+	echo "#!/bin/bash
+log=\"\$1 \$2 \$3 \$4 \$5\" 
+file=\"/etc/openvpn/bin/connection.log\"
+echo \"\$log\" >> \$file" > /etc/openvpn/bin/connection-appender.sh
+
+chmod 0755 /etc/openvpn/bin/connection-appender.sh
+chmod +x /etc/openvpn/bin/connection-appender.sh
+
+	echo "#!/bin/bash
+log=\"\$1 \$2 \$3 \$4 \$5\" 
+file=\"/etc/openvpn/bin/connection.log\"
+tmp=\"/etc/openvpn/bin/connection.tmp\"
+grep -v \"\$log\" \$file > \$tmp
+cp \$tmp \$file
+" > /etc/openvpn/bin/connection-detacher.sh
+
+chmod 0755 /etc/openvpn/bin/connection-detacher.sh
+chmod +x /etc/openvpn/bin/connection-detacher.sh
+
+	echo "#!/bin/bash
+IFS=\$'\n'
+for line in \$(cat /etc/openvpn/bin/connection.log)    
+do
+	common_name=\$(echo \$line | cut -d \" \" -f 1)
+	trusted_ip=\$(echo \$line | cut -d \" \" -f 2)
+	trusted_port=\$(echo \$line | cut -d \" \" -f 3)
+	entry=$(echo \"\$common_name,\$trusted_ip:\$trusted_port\")
+	if grep -q \$entry /etc/openvpn/openvpn-status.log; then
+		continue
+	else
+		url=\$1
+		remote_ip=\$2
+		remote_port=\$3
+		response=\$(curl --request PUT --url \$url --data \"common_name=\$common_name&trusted_ip=\$trusted_ip&trusted_port=\$trusted_port&remote_ip=\$remote_ip&remote_port=\$remote_port&bytes_sent=0&bytes_received=0\" --write-out \"%{http_code}\" --silent --output /dev/null)
+    sh /etc/openvpn/bin/connection-detacher.sh \$common_name \$trusted_ip \$trusted_port \$remote_ip \$remote_port
+	fi
+done
+" > /etc/openvpn/bin/gatekeeper.sh
+
+chmod 0755 /etc/openvpn/bin/gatekeeper.sh
+chmod +x /etc/openvpn/bin/gatekeeper.sh
+
+touch /etc/openvpn/bin/connection.log
+touch /etc/openvpn/bin/connection.tmp
+
+chmod 0777 /etc/openvpn/bin/connection.log
+chmod 0777 /etc/openvpn/bin/connection.tmp
 	
 fi
 exit 0;
