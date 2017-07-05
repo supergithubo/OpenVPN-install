@@ -697,9 +697,9 @@ do
 	if grep -q \$entry /etc/openvpn/openvpn-status.log; then
 		continue
 	else
-		url=\$1
-		remote_ip=\$2
-		remote_port=\$3
+		url=$URL/sys/sessions/disconnect
+		remote_ip=$IP
+		remote_port=$PORT
 		response=\$(curl --request PUT --url \$url --data \"common_name=\$common_name&trusted_ip=\$trusted_ip&trusted_port=\$trusted_port&remote_ip=\$remote_ip&remote_port=\$remote_port&bytes_sent=0&bytes_received=0\" --write-out \"%{http_code}\" --silent --output /dev/null)
     sh /etc/openvpn/bin/connection-detacher.sh \$common_name \$trusted_ip \$trusted_port \$remote_ip \$remote_port
 	fi

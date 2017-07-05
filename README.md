@@ -40,12 +40,14 @@ Then register cron job
 
 Put this lines at the bottom:
 
-`SHELL=/bin/sh
+```
+
+SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 * * * * * /bin/bash /etc/openvpn/bin/gatekeeper.sh
 
-`
+```
 
 Then reboot after (Change IP address if vps reboot reallocate new ip address) :
 
