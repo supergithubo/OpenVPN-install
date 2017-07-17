@@ -262,7 +262,7 @@ else
 	echo "   2) 3072 bits (recommended, best compromise)"
 	echo "   3) 4096 bits (most secure)"
 	while [[ $DH_KEY_SIZE != "1" && $DH_KEY_SIZE != "2" && $DH_KEY_SIZE != "3" ]]; do
-		read -p "DH key size [1-3]: " -e -i 1 DH_KEY_SIZE
+		read -p "DH key size [1-3]: " -e -i 2 DH_KEY_SIZE
 	done
 	case $DH_KEY_SIZE in
 		1)
@@ -281,7 +281,7 @@ else
 	echo "   2) 3072 bits (recommended, best compromise)"
 	echo "   3) 4096 bits (most secure)"
 	while [[ $RSA_KEY_SIZE != "1" && $RSA_KEY_SIZE != "2" && $RSA_KEY_SIZE != "3" ]]; do
-		read -p "DH key size [1-3]: " -e -i 1 RSA_KEY_SIZE
+		read -p "DH key size [1-3]: " -e -i 2 RSA_KEY_SIZE
 	done
 	case $RSA_KEY_SIZE in
 		1)
@@ -598,9 +598,6 @@ persist-tun
 auth-user-pass
 auth SHA256
 $CIPHER
-tls-client
-tls-version-min 1.2
-tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256
 setenv opt block-outside-dns
 verb 3
 sndbuf 0
