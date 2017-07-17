@@ -331,12 +331,6 @@ else
 			wget -O - https://swupdate.openvpn.net/repos/repo-public.gpg | apt-key add -
 			apt-get update
 		fi
-		# Ubuntu 16.04
-		if [[ "$VERSION_ID" = 'VERSION_ID="16.04"' ]]; then
-			echo "deb http://swupdate.openvpn.net/apt xenial main" > /etc/apt/sources.list.d/swupdate-openvpn.list
-			wget -O - https://swupdate.openvpn.net/repos/repo-public.gpg | apt-key add -
-			apt-get update
-		fi
 		# Ubuntu >= 16.04 and Debian > 8 have OpenVPN > 2.3.3 without the need of a third party repository.
 		# The we install OpenVPN
 		apt-get install openvpn iptables openssl wget ca-certificates curl -y
