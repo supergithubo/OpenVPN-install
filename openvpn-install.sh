@@ -61,16 +61,16 @@ newclient () {
 	echo "<ca>" >> ~/$1.ovpn
 	cat /etc/openvpn/easy-rsa/pki/ca.crt >> ~/$1.ovpn
 	echo "</ca>" >> ~/$1.ovpn
-	echo "<cert>" >> ~/$1.ovpn
-	cat /etc/openvpn/easy-rsa/pki/issued/$1.crt >> ~/$1.ovpn
-	echo "</cert>" >> ~/$1.ovpn
-	echo "<key>" >> ~/$1.ovpn
-	cat /etc/openvpn/easy-rsa/pki/private/$1.key >> ~/$1.ovpn
-	echo "</key>" >> ~/$1.ovpn
-	echo "key-direction 1" >> ~/$1.ovpn
-	echo "<tls-auth>" >> ~/$1.ovpn
-	cat /etc/openvpn/tls-auth.key >> ~/$1.ovpn
-	echo "</tls-auth>" >> ~/$1.ovpn
+	# echo "<cert>" >> ~/$1.ovpn
+	# cat /etc/openvpn/easy-rsa/pki/issued/$1.crt >> ~/$1.ovpn
+	# echo "</cert>" >> ~/$1.ovpn
+	# echo "<key>" >> ~/$1.ovpn
+	# cat /etc/openvpn/easy-rsa/pki/private/$1.key >> ~/$1.ovpn
+	# echo "</key>" >> ~/$1.ovpn
+	# echo "key-direction 1" >> ~/$1.ovpn
+	# echo "<tls-auth>" >> ~/$1.ovpn
+	# cat /etc/openvpn/tls-auth.key >> ~/$1.ovpn
+	# echo "</tls-auth>" >> ~/$1.ovpn
 }
 
 # Try to get our IP from the system and fallback to the Internet.
@@ -460,13 +460,9 @@ echo "crl-verify crl.pem
 ca ca.crt
 cert server.crt
 key server.key
-tls-auth tls-auth.key 0
 dh dh.pem
 auth SHA256
 $CIPHER
-tls-server
-tls-version-min 1.2
-tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256
 status openvpn-status.log
 log-append openvpn.log
 verb 3
@@ -480,7 +476,10 @@ client-connect /etc/openvpn/bin/script-connect.sh
 client-disconnect /etc/openvpn/bin/script-disconnect.sh
 verify-client-cert none
 username-as-common-name
-;max-clients 100" >> /etc/openvpn/server.conf
+float
+ping-timer-rem
+route-method exe
+max-clients 125" >> /etc/openvpn/server.conf
 
 	# Create the sysctl configuration file if needed (mainly for Arch Linux)
 	if [[ ! -e $SYSCTL ]]; then
@@ -590,7 +589,6 @@ resolv-retry infinite
 nobind
 persist-key
 persist-tun
-remote-cert-tls server
 auth-user-pass
 auth SHA256
 $CIPHER
@@ -604,6 +602,9 @@ rcvbuf 0
 compress lz4
 script-security 3
 reneg-sec 86400
+float
+ping-timer-rem
+route-method exe
 #up /etc/openvpn/update-resolv-conf
 #down /etc/openvpn/update-resolv-conf" >> /etc/openvpn/client-template.txt
 if [[ "$PROTOCOL" = 'UDP' ]]; then
@@ -700,7 +701,7 @@ do
 		url=$URL/sys/sessions/disconnect
 		remote_ip=$IP
 		remote_port=$PORT
-		response=\$(curl --request PUT --url \$url --data \"common_name=\$common_name&trusted_ip=\$trusted_ip&trusted_port=\$trusted_port&remote_ip=\$remote_ip&remote_port=\$remote_port&bytes_sent=0&bytes_received=0\" --write-out \"%{http_code}\" --silent --output /dev/null)
+		response=\$(curl --request PUT --url \$url --data \"common_name=\$common_name&trusted_ip=\$trusted_ip&trusted_port=\$trusted_port&remote_ip=\$remote_ip&remote_port=\$remote_port&bytes_sent=0&bytes_received=0&executor=1\" --write-out \"%{http_code}\" --silent --output /dev/null)
     sh /etc/openvpn/bin/connection-detacher.sh \$common_name \$trusted_ip \$trusted_port \$remote_ip \$remote_port
 	fi
 done
