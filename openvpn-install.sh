@@ -1018,8 +1018,8 @@ if [[ $COMPRESSION_ENABLED == "y"  ]]; then
 fi
 
 	# Generate the custom client.ovpn
+	generateAuth
 	newClient
-  generateAuth
 	echo "If you want to add more clients, you simply need to run this script another time!"
 }
 
