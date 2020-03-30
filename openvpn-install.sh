@@ -846,9 +846,9 @@ key $SERVER_NAME.key
 auth $HMAC_ALG
 cipher $CIPHER
 ncp-ciphers $CIPHER
-#tls-server
-#tls-version-min 1.2
-#tls-cipher $CC_CIPHER
+tls-server
+tls-version-min 1.2
+tls-cipher $CC_CIPHER
 
 status openvpn-status.log
 log-append openvpn.log
@@ -1007,9 +1007,9 @@ verify-x509-name $SERVER_NAME name
 auth $HMAC_ALG
 auth-nocache
 cipher $CIPHER
-#tls-client
-#tls-version-min 1.2
-#tls-cipher $CC_CIPHER
+tls-client
+tls-version-min 1.2
+tls-cipher $CC_CIPHER
 setenv opt block-outside-dns # Prevent Windows 10 DNS leak
 verb 3" >> /etc/openvpn/client-template.txt
 
