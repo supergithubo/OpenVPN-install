@@ -849,7 +849,6 @@ ncp-ciphers $CIPHER
 tls-server
 tls-version-min 1.2
 tls-cipher $CC_CIPHER
-
 status openvpn-status.log
 log-append openvpn.log
 verb 3
@@ -1002,7 +1001,8 @@ resolv-retry infinite
 nobind
 persist-key
 persist-tun
-#remote-cert-tls server
+auth-user-pass
+remote-cert-tls server
 verify-x509-name $SERVER_NAME name
 auth $HMAC_ALG
 auth-nocache
@@ -1011,7 +1011,16 @@ tls-client
 tls-version-min 1.2
 tls-cipher $CC_CIPHER
 setenv opt block-outside-dns # Prevent Windows 10 DNS leak
-verb 3" >> /etc/openvpn/client-template.txt
+verb 3
+sndbuf 0
+rcvbuf 0
+script-security 3
+reneg-sec 86400
+float
+ping-timer-rem
+route-method exe
+#up /etc/openvpn/update-resolv-conf
+#down /etc/openvpn/update-resolv-conf" >> /etc/openvpn/client-template.txt
 
 if [[ $COMPRESSION_ENABLED == "y"  ]]; then
 	echo "compress $COMPRESSION_ALG" >> /etc/openvpn/client-template.txt
