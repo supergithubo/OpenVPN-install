@@ -864,7 +864,8 @@ username-as-common-name
 float
 ping-timer-rem
 route-method exe
-max-clients 125" >> /etc/openvpn/server.conf
+max-clients 125
+client-config-dir /etc/openvpn/ccd" >> /etc/openvpn/server.conf
 
 	# Create log dir
 	mkdir -p /var/log/openvpn
@@ -1025,6 +1026,10 @@ route-method exe
 if [[ $COMPRESSION_ENABLED == "y"  ]]; then
 	echo "compress $COMPRESSION_ALG" >> /etc/openvpn/client-template.txt
 fi
+
+	mkdir /etc/openvpn/ccd
+	echo "ifconfig-push 10.8.0.2 255.255.255.0" >> /etc/openvpn/ccd/$CLIENT
+	echo "$CLIENT,10.8.0.2" >> /etc/openvpn/ipp.txt
 
 	# Generate the custom client.ovpn
 	generateAuth
